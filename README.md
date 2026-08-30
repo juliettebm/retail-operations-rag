@@ -1,5 +1,12 @@
 # Retail Operations AI — Maison Kurt
 
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![LangChain](https://img.shields.io/badge/LangChain-RAG%20%7C%20text--to--SQL-1C3C3C?logo=langchain&logoColor=white)](https://www.langchain.com/)
+[![FAISS](https://img.shields.io/badge/FAISS-vector%20search-005571)](https://github.com/facebookresearch/faiss)
+[![SQLite](https://img.shields.io/badge/SQLite-text--to--SQL-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-interface-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
 POC de deux assistants IA pour les opérations retail, sur une documentation et des données **entièrement fictives** (Maison Kurt) :
 
 1. **RAG** — retrouver une procédure dans la documentation interne (retours, échanges, remboursements, commandes en ligne), avec une petite interface Streamlit.
