@@ -1,0 +1,16 @@
+langchain-core
+langchain-text-splitters
+langchain-community
+langchain-huggingface
+langchain-openai
+langchain-ollama
+sentence-transformers
+faiss-cpu
+pypdf
+streamlit
+# Donnees operationnelles + assistant text-to-SQL :
+pandas>=1.5
+numpy>=1.23
+sqlglot>=25.0            # validation structurelle du SQL genere (garde-fous)
+seaborn>=0.12
+matplotlib>=3.6

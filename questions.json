@@ -1,0 +1,115 @@
+[
+  {
+    "question": "Quel est le délai de retour d'un article standard acheté en magasin ?",
+    "reference": "Le délai est de 30 jours calendaires.",
+    "mots_cles_attendus": [
+      "30 jours",
+      "article standard"
+    ]
+  },
+  {
+    "question": "Quelles sont les conditions pour accepter le retour d'un article standard ?",
+    "reference": "L'article doit être dans son état d'origine, non porté et non utilisé, avec ses étiquettes lorsqu'elles étaient présentes, et une preuve d'achat doit être présentée.",
+    "mots_cles_attendus": [
+      "état d'origine",
+      "preuve d'achat"
+    ]
+  },
+  {
+    "question": "Quel est le délai de retour pour un article soldé ?",
+    "reference": "Le délai de retour d'un article soldé est de 14 jours calendaires.",
+    "mots_cles_attendus": [
+      "14 jours",
+      "articles soldés"
+    ]
+  },
+  {
+    "question": "Un article personnalisé peut-il être retourné ?",
+    "reference": "Non, sauf s'il présente un défaut relevant de la procédure de prise en charge des articles défectueux.",
+    "mots_cles_attendus": [
+      "articles personnalisés",
+      "défaut"
+    ]
+  },
+  {
+    "question": "Que faire si le client n'a pas sa preuve d'achat ?",
+    "reference": "Rechercher une preuve d'achat numérique. Si aucune preuve ne peut être retrouvée, transmettre le dossier au responsable de rayon.",
+    "mots_cles_attendus": [
+      "preuve d'achat numérique",
+      "responsable de rayon"
+    ]
+  },
+  {
+    "question": "Comment est remboursé un achat payé par carte bancaire ?",
+    "reference": "Le remboursement est réalisé sur la carte utilisée lors de l'achat, sous réserve des possibilités techniques du système de paiement.",
+    "mots_cles_attendus": [
+      "carte bancaire",
+      "carte utilisée"
+    ]
+  },
+  {
+    "question": "Que se passe-t-il lorsqu'un article échangé est plus cher ?",
+    "reference": "Le client règle la différence au moment de l'échange.",
+    "mots_cles_attendus": [
+      "plus cher",
+      "règle la différence"
+    ]
+  },
+  {
+    "question": "Quelle information faut-il rechercher en priorité pour une commande en ligne ?",
+    "reference": "Le numéro de commande est l'information de référence à rechercher en priorité.",
+    "mots_cles_attendus": [
+      "numéro de commande"
+    ]
+  },
+  {
+    "question": "Que doit faire un conseiller face à un colis reçu endommagé ?",
+    "reference": "Il doit enregistrer le signalement et vérifier les informations de livraison, sans promettre immédiatement un remboursement.",
+    "mots_cles_attendus": [
+      "colis",
+      "endommagé",
+      "vérifier"
+    ]
+  },
+  {
+    "question": "Un client VIP bénéficie-t-il automatiquement de règles de retour différentes ?",
+    "reference": "Non. Le statut VIP ne modifie pas automatiquement les règles de retour.",
+    "mots_cles_attendus": [
+      "VIP",
+      "pas automatiquement"
+    ]
+  },
+  {
+    "question": "Quelle procédure appliquer à un article vendu par un partenaire Marketplace ?",
+    "reference": "Vérifier le vendeur et les conditions applicables. En cas de doute, orienter le dossier vers le support Marketplace.",
+    "mots_cles_attendus": [
+      "Marketplace",
+      "vendeur",
+      "support Marketplace"
+    ]
+  },
+  {
+    "question": "Une promotion signifie-t-elle automatiquement que l'article ne peut pas être retourné ?",
+    "reference": "Non. Une promotion ne signifie pas automatiquement que l'article est exclu des retours.",
+    "mots_cles_attendus": [
+      "promotion",
+      "pas automatiquement",
+      "retours"
+    ]
+  },
+  {
+    "question": "Quelle est la politique de congés des employés de Maison Kurt ?",
+    "reference": "",
+    "mots_cles_attendus": []
+  },
+  {
+    "question": "Quel est le salaire d'un conseiller de vente chez Maison Kurt ?",
+    "reference": "",
+    "mots_cles_attendus": []
+  },
+  {
+    "question": "Quels sont les horaires d'ouverture du magasin Maison Kurt ?",
+    "reference": "",
+    "mots_cles_attendus": []
+  }
+]
