@@ -1,6 +1,6 @@
 """
-Assistant operations Maison Kurt -- interface Streamlit pour le pipeline RAG
-demontre dans notebook/01_retail_operations_rag.ipynb.
+Assistant opérations Maison Kurt : interface Streamlit pour le pipeline RAG
+démontré dans notebook/01_retail_operations_rag.ipynb.
 
 Usage :
     streamlit run app.py
@@ -32,27 +32,27 @@ CHUNK_OVERLAP = 50
 K = 2
 
 PROMPT = (
-    "Tu es un assistant d'analyse de documents operationnels retail.\n\n"
-    "Reponds a la question UNIQUEMENT a partir du contexte fourni.\n\n"
+    "Tu es un assistant d'analyse de documents opérationnels retail.\n\n"
+    "Réponds à la question UNIQUEMENT à partir du contexte fourni.\n\n"
     "IMPORTANT :\n"
     "- Lis attentivement toutes les informations pertinentes du contexte.\n"
-    "- Si le contexte indique qu'une regle ne s'applique PAS, "
-    "reponds clairement que la regle ne s'applique pas.\n"
-    "- Les formulations negatives comme « ne modifie pas », "
+    "- Si le contexte indique qu'une règle ne s'applique PAS, "
+    "réponds clairement que la règle ne s'applique pas.\n"
+    "- Les formulations négatives comme « ne modifie pas », "
     "« ne signifie pas automatiquement » ou « ne peut pas » "
-    "contiennent des informations importantes et doivent etre utilisees "
-    "pour repondre a la question.\n"
-    "- Ne reponds jamais « Information non trouvee » si le contexte "
-    "contient explicitement ou directement la reponse.\n\n"
-    "Si aucune information permettant de repondre a la question "
-    "n'est presente dans le contexte, reponds EXACTEMENT : "
-    "« Information non trouvee dans les documents. »\n\n"
+    "contiennent des informations importantes et doivent être utilisées "
+    "pour répondre à la question.\n"
+    "- Ne réponds jamais « Information non trouvée » si le contexte "
+    "contient explicitement ou directement la réponse.\n\n"
+    "Si aucune information permettant de répondre à la question "
+    "n'est présente dans le contexte, réponds EXACTEMENT : "
+    "« Information non trouvée dans les documents. »\n\n"
     "Sois concis et factuel.\n"
     "Lorsque tu utilises une information du contexte, cite entre "
     "guillemets l'extrait correspondant.\n\n"
     "Contexte :\n{context}\n\n"
     "Question : {question}\n"
-    "Reponse :"
+    "Réponse :"
 )
 
 
@@ -94,7 +94,7 @@ def answer_question(question: str, retriever, generation_chain):
 
 
 st.set_page_config(
-    page_title="Maison Kurt -- Assistant operations",
+    page_title="Maison Kurt : assistant opérations",
     page_icon="\U0001F4E6",
     layout="centered",
 )
@@ -175,11 +175,11 @@ h1,h2,h3{font-family:var(--serif)!important;color:var(--ink)!important;font-weig
 st.html(
     """
 <div class="rag-header">
-  <p class="eyebrow">Maison Kurt &middot; assistant operations</p>
-  <p class="rag-title">Retrouver une procedure retail</p>
-  <p class="rag-standfirst">Pose une question sur les retours, echanges, remboursements ou commandes
-  en ligne. La reponse est generee a partir des passages les plus pertinents de la documentation
-  interne (fictive), affiches ci-dessous pour verification.</p>
+  <p class="eyebrow">Maison Kurt &middot; assistant opérations</p>
+  <p class="rag-title">Retrouver une procédure retail</p>
+  <p class="rag-standfirst">Pose une question sur les retours, échanges, remboursements ou commandes
+  en ligne. La réponse est générée à partir des passages les plus pertinents de la documentation
+  interne (fictive), affichés ci-dessous pour vérification.</p>
 </div>
 """
 )
@@ -189,26 +189,26 @@ with st.spinner("Chargement du pipeline (documents, embeddings, index)..."):
 
 question = st.text_input(
     "Question",
-    placeholder="Ex. : Quel est le delai de retour d'un article solde ?",
+    placeholder="Ex. : Quel est le délai de retour d'un article soldé ?",
     label_visibility="collapsed",
 )
 ask = st.button("Poser la question")
 
 if ask and question.strip():
     try:
-        with st.spinner("Recherche du passage pertinent, puis generation (~20 secondes)..."):
+        with st.spinner("Recherche du passage pertinent, puis génération (~20 secondes)..."):
             answer, sources = answer_question(question.strip(), retriever, generation_chain)
 
         st.html(
             f"""
 <div class="answer-card">
-  <span class="answer-label">Reponse</span>
+  <span class="answer-label">Réponse</span>
   <p class="answer-text">{escape(answer)}</p>
 </div>
 """
         )
 
-        st.html('<p class="sources-label">Passages utilises</p>')
+        st.html('<p class="sources-label">Passages utilisés</p>')
         for source in sources:
             doc_name = source.metadata.get("source", "inconnue")
             st.html(
@@ -224,10 +224,10 @@ if ask and question.strip():
             f"""
 <div class="error-card">
   <span class="error-label">Erreur</span>
-  <p class="error-text">Ollama semble indisponible ou a manque de memoire. Verifie qu'Ollama tourne
-  (<code>ollama list</code>) puis reessaie.<br>Detail : {escape(type(exc).__name__)} -- {escape(str(exc)[:200])}</p>
+  <p class="error-text">Ollama semble indisponible ou a manqué de mémoire. Vérifie qu'Ollama tourne
+  (<code>ollama list</code>) puis réessaie.<br>Détail : {escape(type(exc).__name__)} : {escape(str(exc)[:200])}</p>
 </div>
 """
         )
 elif ask:
-    st.warning("Ecris une question avant de valider.")
+    st.warning("Écris une question avant de valider.")
