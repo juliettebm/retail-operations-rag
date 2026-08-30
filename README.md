@@ -19,6 +19,10 @@ POC de deux assistants IA pour les opérations retail, sur une documentation et 
 - `data/*.md` : les 4 guides opérationnels fictifs qui composent le corpus.
 - `questions.json` : jeu de questions utilisé pour l'évaluation du retrieval et de la génération.
 
+**Résultats** : hit-rate du retrieval de 100% à partir de k=2 (83,3% à k=1, sur les 12 questions du périmètre) ; fidélité et exactitude moyennes de 1,73/2 en LLM-as-a-judge (15 questions) ; garde-fou anti-hallucination correct sur 3 des 4 questions hors périmètre testées.
+
+**Limites** : un hit-rate à 100% ne garantit pas une réponse juste, sur une question test le bon chiffre est présent dans le contexte à k=2 et le modèle choisit quand même le mauvais (le notebook le montre explicitement, §6). Le hit-rate lui-même est une approximation par mots-clés, pas un Recall@k annoté à la main. Le juge LLM-as-a-judge se contredit parfois lui-même (note 0/0 avec un commentaire disant la réponse correcte, sur 2 des 15 questions). Llama 3.2 (3B, local) est retenu pour le coût et le hors-ligne, pas pour la précision.
+
 Lancer l'interface :
 
 ```bash
@@ -34,6 +38,10 @@ streamlit run app.py
 - `responsible_ai/model_card.md` : model card de l'assistant (en anglais), périmètre, garde-fous, précision mesurée, limites.
 
 Garde-fous de l'assistant : connexion en lecture seule, validation structurelle de la requête par arbre syntaxique (`sqlglot`), liste blanche de tables (jointures comprises), plafond de lignes et délai d'exécution.
+
+**Résultats** (17 questions, comparaison du résultat SQL complet, pas juste sa première valeur) : execution accuracy de 82,4% (14/17) sur la dernière exécution, 88,2% (15/17) sur une exécution précédente avec le même prompt. Le taux avec jointure tient à 83,3% (5/6) les deux fois ; c'est le taux sans jointure qui varie (81,8% puis 90,9%), pas d'écart fiable entre questions à une table et questions à jointure sur ces deux mesures. Aucun échec, dans un cas comme dans l'autre, n'a été bloqué par le garde-fou : les requêtes exécutent, elles répondent juste à côté (division entière tronquée, colonne ambiguë après jointure, filtre non demandé recopié d'un exemple du prompt).
+
+**Limites** : seulement 6 questions à jointure, un échantillon trop petit pour une mesure fiable, un seul cas qui bascule déplace ce taux de 17 points. Le garde-fou prouve ce qui ne peut pas arriver (écriture, table hors périmètre) mais rien sur la justesse de la réponse, mesurée séparément. La narration en langage naturel (fonction `ask`, utilisée par la démo et par `app_sql.py`) n'est pas couverte par cette accuracy : elle peut se tromper même quand le SQL est correct (bug reproduit deux fois : le SQL renvoie 1080, la phrase dit "1 commande"). Llama 3.2 (3B, local) est retenu pour le coût et le hors-ligne, pas pour la précision. Détail complet dans `responsible_ai/model_card.md`.
 
 Lancer l'interface (après avoir exécuté `02_generation_donnees.ipynb` au moins une fois) :
 
