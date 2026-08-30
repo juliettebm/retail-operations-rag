@@ -29,6 +29,7 @@ streamlit run app.py
 
 - `notebook/02_generation_donnees.ipynb` : génère `data/operations.sqlite` (magasins, commandes, retours, remboursements) à partir des règles écrites dans les guides opérationnels. À exécuter en premier.
 - `notebook/03_text_to_sql_operations.ipynb` : exploration des données, garde-fous et assistant text-to-SQL, tests des garde-fous, démonstration, évaluation par exécution (question, SQL de référence, comparaison des résultats). Tout le code du notebook est dans ses propres cellules, sans import depuis un fichier `.py` séparé.
+- `notebook/questions.py` : le jeu de 17 questions de référence (`EVAL_SET`) importé par le notebook pour l'évaluation.
 - `app_sql.py` : interface Streamlit de l'assistant text-to-SQL. Pose une question, le SQL généré et le résultat s'affichent avec la réponse rédigée.
 - `responsible_ai/model_card.md` : model card de l'assistant (en anglais), périmètre, garde-fous, précision mesurée, limites.
 
@@ -55,6 +56,7 @@ data/              guides operationnels (.md) + base generee (operations.sqlite)
 notebook/          01_retail_operations_rag.ipynb
                    02_generation_donnees.ipynb
                    03_text_to_sql_operations.ipynb
+                   questions.py
 responsible_ai/    model_card.md
 app.py             interface Streamlit du RAG
 app_sql.py         interface Streamlit du text-to-SQL
