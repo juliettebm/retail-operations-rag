@@ -33,14 +33,14 @@ Read-only SQLite connection (`mode=ro`, the engine refuses any write regardless 
 
 Two runs of the fixed evaluation, same 17 questions, same model at temperature 0 (Ollama is not perfectly deterministic in practice):
 
-| | reussies | total | % reussi |
+| | passed | total | % passed |
 |---|---:|---:|---:|
-| **Global (run 1)** | 15 | 17 | 88.2% |
-| sans jointure (run 1) | 10 | 11 | 90.9% |
-| avec jointure (run 1) | 5 | 6 | 83.3% |
-| **Global (run 2)** | 14 | 17 | 82.4% |
-| sans jointure (run 2) | 9 | 11 | 81.8% |
-| avec jointure (run 2) | 5 | 6 | 83.3% |
+| **Overall (run 1)** | 15 | 17 | 88.2% |
+| no join (run 1) | 10 | 11 | 90.9% |
+| with join (run 1) | 5 | 6 | 83.3% |
+| **Overall (run 2)** | 14 | 17 | 82.4% |
+| no join (run 2) | 9 | 11 | 81.8% |
+| with join (run 2) | 5 | 6 | 83.3% |
 
 Join accuracy landed at 83.3% both times; no-join accuracy moved from 90.9% to 81.8%. Across the two runs there is no consistent join penalty: the join and no-join figures are within the run-to-run noise of each other, which is itself the more interesting result, since a join penalty was the effect this evaluation set was built to isolate. With only 6 join questions, one result flipping shifts that figure by roughly 17 points, so neither run's exact percentage should be read as a precise estimate.
 
