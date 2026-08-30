@@ -31,20 +31,25 @@ Read-only SQLite connection (`mode=ro`, the engine refuses any write regardless 
 
 17 business questions, each with a hand-written reference SQL, checked against the actual database. The comparison (`resultats_egaux`) checks the full result, not just its first value: same number of rows and columns, numeric values equal within 0.01, text values compared after normalisation (case, whitespace). An earlier version of this comparison looked only at the first cell of the result, which unfairly failed any question whose correct answer spans several rows (a store ranking, for instance). That bug, not the model, was the main driver of a much lower accuracy figure in an earlier pass of this evaluation.
 
+Two runs of the fixed evaluation, same 17 questions, same model at temperature 0 (Ollama is not perfectly deterministic in practice):
+
 | | reussies | total | % reussi |
 |---|---:|---:|---:|
-| **Global** | 15 | 17 | **88.2%** |
-| sans jointure | 10 | 11 | 90.9% |
-| avec jointure | 5 | 6 | 83.3% |
+| **Global (run 1)** | 15 | 17 | 88.2% |
+| sans jointure (run 1) | 10 | 11 | 90.9% |
+| avec jointure (run 1) | 5 | 6 | 83.3% |
+| **Global (run 2)** | 14 | 17 | 82.4% |
+| sans jointure (run 2) | 9 | 11 | 81.8% |
+| avec jointure (run 2) | 5 | 6 | 83.3% |
 
-The evaluation set was built with a deliberate mix of single-table and join questions to isolate this gap. Once the comparison bug above was fixed, the gap turned out to be modest (about 8 points), not the sharp drop a smaller, biased sample of the metric first suggested. With only 6 join questions, this gap is not a number to over-read: one question moving from fail to pass shifts it by roughly 17 points.
+Join accuracy landed at 83.3% both times; no-join accuracy moved from 90.9% to 81.8%. Across the two runs there is no consistent join penalty: the join and no-join figures are within the run-to-run noise of each other, which is itself the more interesting result, since a join penalty was the effect this evaluation set was built to isolate. With only 6 join questions, one result flipping shifts that figure by roughly 17 points, so neither run's exact percentage should be read as a precise estimate.
 
-Of the 2 failures, neither was blocked by the guardrail (0 `refus_garde_fou`): the model always produced a query on an allowed table with no write and no disallowed construct. One (`ecart`, no join) computed an integer-division percentage that rounded to 0 instead of ~24%. One (`echec_execution`, join) referenced an ambiguous or misattributed column across the joined tables. The detailed table in the notebook (section 8) lists both with the generated SQL.
+None of the failures in either run were blocked by the guardrail (0 `refus_garde_fou` across both): the model always produced a query on an allowed table with no write and no disallowed construct. Failures split between `ecart` (executes, wrong value) and `echec_execution` (fails to execute). Recurring causes: an integer-division percentage that rounds to 0 instead of the correct value (missing a float cast), a numeric result off by a small margin (a filter or rounding difference), and an ambiguous or misattributed column across joined tables (for instance selecting `magasin_id` when both joined tables have a column of that name). The detailed table in the notebook (section 8) lists every failure with its generated SQL.
 
 ## Limitations
 
 - **Small local model**: `llama3.2` (3B) was chosen for cost (free) and offline availability, not for accuracy.
-- **Evaluation set size**: 17 questions, only 6 with a join, is enough to see that a join penalty exists, not enough to size it precisely: the confidence interval on the join-only accuracy is wide.
-- **Guardrail scope**: the guardrail proves what cannot happen (no write, no table outside the whitelist, no multi-statement injection); it says nothing about whether the query answers the question asked. The two must not be conflated: a system can be entirely safe and still wrong, which is what happened on both failures here.
+- **Evaluation set size**: 17 questions, only 6 with a join, is too small to conclude either way on a join penalty: across two runs the join and no-join accuracy were within noise of each other, and a single question moving from fail to pass shifts the join-only figure by roughly 17 points.
+- **Guardrail scope**: the guardrail proves what cannot happen (no write, no table outside the whitelist, no multi-statement injection); it says nothing about whether the query answers the question asked. The two must not be conflated: a system can be entirely safe and still wrong, which is what happened on every failure in both runs here.
 - **Narration step**: the assistant used in the demo (`ask`, section 7) drafts a final sentence from the SQL result; this step is not covered by the execution-accuracy evaluation above, which compares raw SQL results, generated via a separate function (`generate_sql`) that skips narration entirely. The demo notebook shows a concrete case of this gap: the narrated answer states "1 commande" directly below a SQL result of 1080. The SQL was correct, the sentence describing it was not.
 - **Synthetic data**: every number in this card describes a generated dataset built to reproduce documented business rules, not a measurement of a real retailer's operations.
