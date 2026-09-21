@@ -1,10 +1,20 @@
 {
-  "run_date": "2026-09-20",
-  "dataset_size": 26,
-  "in_scope": 18,
-  "out_of_scope": 8,
+  "dataset_size": 65,
+  "in_scope": 52,
+  "out_of_scope": 13,
+  "hard_in_scope": 26,
   "embedding_model": "intfloat/multilingual-e5-small",
   "k": 5,
-  "recall@5": 1.0,
-  "mrr@5": 0.9722222222222222
+  "recall@1": 0.7019230769230769,
+  "mrr@1": 0.7692307692307693,
+  "hard_recall@1": 0.5192307692307693,
+  "hard_mrr@1": 0.6153846153846154,
+  "recall@2": 0.7403846153846154,
+  "mrr@2": 0.7788461538461539,
+  "hard_recall@2": 0.5192307692307693,
+  "hard_mrr@2": 0.6153846153846154,
+  "recall@5": 0.8365384615384616,
+  "mrr@5": 0.7961538461538461,
+  "hard_recall@5": 0.7115384615384616,
+  "hard_mrr@5": 0.6499999999999999
 }

@@ -1,6 +1,5 @@
 """
-Assistant opérations Maison Kurt : interface Streamlit pour le pipeline RAG
-démontré dans notebook/01_retail_operations_rag.ipynb.
+Assistant opérations Maison Kurt : interface Streamlit pour le pipeline RAG.
 
 Usage :
     streamlit run app.py
@@ -16,9 +15,9 @@ from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_ollama import ChatOllama
-from retail_rag.core import REFUSAL, format_context, load_passages, should_refuse, validate_citations
+from retail_rag.core import PROMPT, REFUSAL, format_context, load_passages, should_refuse, validate_citations
+from retail_rag.pipeline import build_e5_embeddings
 
 os.environ.setdefault("LLM_PROVIDER", "ollama")
 os.environ.setdefault("OLLAMA_MODEL", "llama3.2:3b")
@@ -30,32 +29,6 @@ EMBED_MODEL = "intfloat/multilingual-e5-small"
 K = 2
 MIN_RELEVANCE_SCORE = float(os.getenv("MIN_RELEVANCE_SCORE", "0.35"))
 
-PROMPT = (
-    "Tu es un assistant d'analyse de documents opérationnels retail.\n\n"
-    "Réponds à la question UNIQUEMENT à partir du contexte fourni.\n\n"
-    "IMPORTANT :\n"
-    "- Lis attentivement toutes les informations pertinentes du contexte.\n"
-    "- Si le contexte indique qu'une règle ne s'applique PAS, "
-    "réponds clairement que la règle ne s'applique pas.\n"
-    "- Les formulations négatives comme « ne modifie pas », "
-    "« ne signifie pas automatiquement » ou « ne peut pas » "
-    "contiennent des informations importantes et doivent être utilisées "
-    "pour répondre à la question.\n"
-    "- Ne réponds jamais « Information non trouvée » si le contexte "
-    "contient explicitement ou directement la réponse.\n\n"
-    "Si aucune information permettant de répondre à la question "
-    "n'est présente dans le contexte, réponds EXACTEMENT : "
-    "« Information non trouvée dans les documents. »\n\n"
-    "Sois concis et factuel.\n"
-    "Toute réponse factuelle doit se terminer par un ou plusieurs identifiants "
-    "de source exactement sous la forme [fichier.md#section-N]. "
-    "N'invente jamais un identifiant.\n\n"
-    "Contexte :\n{context}\n\n"
-    "Question : {question}\n"
-    "Réponse :"
-)
-
-
 @st.cache_resource(show_spinner=False)
 def load_pipeline():
     passages = load_passages(DATA_DIR)
@@ -64,10 +37,7 @@ def load_pipeline():
         metadata={"source": passage.source, "passage_id": passage.id, "heading": passage.heading},
     ) for passage in passages]
 
-    embedding_model = HuggingFaceEmbeddings(
-        model_name=EMBED_MODEL,
-        encode_kwargs={"normalize_embeddings": True},
-    )
+    embedding_model = build_e5_embeddings(EMBED_MODEL)
     store = FAISS.from_documents(chunks, embedding_model)
 
     llm = ChatOllama(

@@ -12,6 +12,7 @@ from sentence_transformers import SentenceTransformer
 from retail_rag.core import load_passages, retrieval_metrics
 
 ROOT = Path(__file__).resolve().parent
+APP_K = 2  # number of passages app.py sends to the LLM
 
 
 def main() -> None:
@@ -36,14 +37,24 @@ def main() -> None:
     _, indices = index.search(query_vectors, args.k)
     rankings = [[passages[i].id for i in row] for row in indices]
     relevant = [set(item["relevant_passage_ids"]) for item in scoped]
+    hard = [i for i, item in enumerate(scoped) if item.get("level") == "hard"]
     report = {
         "dataset_size": len(dataset),
         "in_scope": len(scoped),
         "out_of_scope": len(dataset) - len(scoped),
+        "hard_in_scope": len(hard),
         "embedding_model": args.model,
         "k": args.k,
-        **retrieval_metrics(rankings, relevant, args.k),
     }
+    # k=1 is the most discriminating cutoff, k=APP_K is what the app sends to the LLM.
+    for cutoff in sorted({1, APP_K, args.k}):
+        report.update(retrieval_metrics(rankings, relevant, cutoff))
+        report.update({
+            f"hard_{key}": value
+            for key, value in retrieval_metrics(
+                [rankings[i] for i in hard], [relevant[i] for i in hard], cutoff
+            ).items()
+        })
     if args.check:
         expected = json.loads(args.check.read_text(encoding="utf-8"))
         for key, value in report.items():

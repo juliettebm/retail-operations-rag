@@ -19,3 +19,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Archive locale (ancienne version du POC, non publiée)
+archive_local/
