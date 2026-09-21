@@ -48,7 +48,7 @@ streamlit run app.py
 pip install -r requirements.txt
 ```
 
-Nécessite [Ollama](https://ollama.com) avec le modèle explicite `llama3.2:3b` (`ollama pull llama3.2:3b`). Les dépendances Python sont figées dans `requirements.txt`; Python 3.11 est recommandé.
+Nécessite [Ollama](https://ollama.com) avec le modèle explicite `llama3.2:3b` (`ollama pull llama3.2:3b`). Les dépendances Python sont figées dans `requirements.txt`; Python 3.11 est recommandé (le notebook a aussi été exécuté avec Python 3.12). Le modèle d'embeddings `intfloat/multilingual-e5-small` est téléchargé automatiquement au premier lancement, ce qui nécessite une connexion internet.
 
 ## Structure
 
