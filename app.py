@@ -18,18 +18,17 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_ollama import ChatOllama
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from retail_rag.core import REFUSAL, format_context, load_passages, should_refuse, validate_citations
 
 os.environ.setdefault("LLM_PROVIDER", "ollama")
-os.environ.setdefault("OLLAMA_MODEL", "llama3.2")
+os.environ.setdefault("OLLAMA_MODEL", "llama3.2:3b")
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
 
 EMBED_MODEL = "intfloat/multilingual-e5-small"
-CHUNK_SIZE = 400
-CHUNK_OVERLAP = 50
 K = 2
+MIN_RELEVANCE_SCORE = float(os.getenv("MIN_RELEVANCE_SCORE", "0.35"))
 
 PROMPT = (
     "Tu es un assistant d'analyse de documents opérationnels retail.\n\n"
@@ -48,8 +47,9 @@ PROMPT = (
     "n'est présente dans le contexte, réponds EXACTEMENT : "
     "« Information non trouvée dans les documents. »\n\n"
     "Sois concis et factuel.\n"
-    "Lorsque tu utilises une information du contexte, cite entre "
-    "guillemets l'extrait correspondant.\n\n"
+    "Toute réponse factuelle doit se terminer par un ou plusieurs identifiants "
+    "de source exactement sous la forme [fichier.md#section-N]. "
+    "N'invente jamais un identifiant.\n\n"
     "Contexte :\n{context}\n\n"
     "Question : {question}\n"
     "Réponse :"
@@ -58,23 +58,20 @@ PROMPT = (
 
 @st.cache_resource(show_spinner=False)
 def load_pipeline():
-    documents = []
-    for path in sorted(DATA_DIR.glob("*.md")):
-        text = path.read_text(encoding="utf-8")
-        documents.append(Document(page_content=text, metadata={"source": path.name}))
+    passages = load_passages(DATA_DIR)
+    chunks = [Document(
+        page_content=passage.text,
+        metadata={"source": passage.source, "passage_id": passage.id, "heading": passage.heading},
+    ) for passage in passages]
 
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE,
-        chunk_overlap=CHUNK_OVERLAP,
+    embedding_model = HuggingFaceEmbeddings(
+        model_name=EMBED_MODEL,
+        encode_kwargs={"normalize_embeddings": True},
     )
-    chunks = splitter.split_documents(documents)
-
-    embedding_model = HuggingFaceEmbeddings(model_name=EMBED_MODEL)
     store = FAISS.from_documents(chunks, embedding_model)
-    retriever = store.as_retriever(search_kwargs={"k": K})
 
     llm = ChatOllama(
-        model=os.getenv("OLLAMA_MODEL", "llama3.2"),
+        model=os.getenv("OLLAMA_MODEL", "llama3.2:3b"),
         temperature=0.0,
     )
     generation_chain = (
@@ -83,13 +80,21 @@ def load_pipeline():
         | StrOutputParser()
     )
 
-    return retriever, generation_chain
+    return store, generation_chain
 
 
-def answer_question(question: str, retriever, generation_chain):
-    sources = retriever.invoke(question)
-    context = "\n\n".join(source.page_content for source in sources)
+def answer_question(question: str, store, generation_chain):
+    ranked = store.similarity_search_with_relevance_scores(question, k=K)
+    if should_refuse([score for _, score in ranked], MIN_RELEVANCE_SCORE):
+        return REFUSAL, []
+    sources = [document for document, _ in ranked]
+    passages = [type("RetrievedPassage", (), {
+        "id": source.metadata["passage_id"], "text": source.page_content
+    }) for source in sources]
+    context = format_context(passages)
     answer = generation_chain.invoke({"context": context, "question": question})
+    if not validate_citations(answer, passages):
+        return REFUSAL, sources
     return answer, sources
 
 
@@ -185,7 +190,7 @@ st.html(
 )
 
 with st.spinner("Chargement du pipeline (documents, embeddings, index)..."):
-    retriever, generation_chain = load_pipeline()
+    store, generation_chain = load_pipeline()
 
 question = st.text_input(
     "Question",
@@ -197,7 +202,7 @@ ask = st.button("Poser la question")
 if ask and question.strip():
     try:
         with st.spinner("Recherche du passage pertinent, puis génération (~20 secondes)..."):
-            answer, sources = answer_question(question.strip(), retriever, generation_chain)
+            answer, sources = answer_question(question.strip(), store, generation_chain)
 
         st.html(
             f"""
@@ -210,7 +215,7 @@ if ask and question.strip():
 
         st.html('<p class="sources-label">Passages utilisés</p>')
         for source in sources:
-            doc_name = source.metadata.get("source", "inconnue")
+            doc_name = source.metadata.get("passage_id", source.metadata.get("source", "inconnue"))
             st.html(
                 f"""
 <div class="source-card">

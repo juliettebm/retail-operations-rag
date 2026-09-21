@@ -1,0 +1,10 @@
+{
+  "run_date": "2026-09-20",
+  "dataset_size": 26,
+  "in_scope": 18,
+  "out_of_scope": 8,
+  "embedding_model": "intfloat/multilingual-e5-small",
+  "k": 5,
+  "recall@5": 1.0,
+  "mrr@5": 0.9722222222222222
+}
