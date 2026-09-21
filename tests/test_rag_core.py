@@ -9,6 +9,7 @@ from retail_rag.core import (
     should_refuse,
     validate_citations,
 )
+from retail_rag.pipeline import parse_judge_scores, retrieval_hit
 
 
 def test_passage_ids_are_stable_and_unique():
@@ -44,3 +45,21 @@ def test_scope_guardrail_handles_empty_low_and_in_scope_results():
     assert should_refuse([], 0.35)
     assert should_refuse([0.12, 0.34], 0.35)
     assert not should_refuse([0.35, 0.2], 0.35)
+
+
+def test_notebook_retrieval_hit_handles_scoped_and_unscoped_questions():
+    sources = [type("Document", (), {"page_content": "Retour accepté sous 30 jours."})()]
+    assert retrieval_hit(sources, ["retour", "30 jours"])
+    assert not retrieval_hit(sources, ["remboursement"])
+    assert retrieval_hit(sources, []) is None
+
+
+def test_judge_scores_are_parsed_and_aggregated():
+    result = parse_judge_scores([
+        {"evaluation": "FIDÉLITÉ: 2\nEXACTITUDE: 1"},
+        {"evaluation": "FIDELITE: 1\nEXACTITUDE: 2"},
+    ])
+    assert result["fidelity_scores"] == [2, 1]
+    assert result["accuracy_scores"] == [1, 2]
+    assert result["mean_fidelity"] == 1.5
+    assert result["mean_accuracy"] == 1.5
